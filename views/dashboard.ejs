@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - TaskFlow</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="container">
+    <div style="float:right;">
+      Olá, <strong><%= user ? user.name : '' %></strong>
+      <form action="/auth/logout" method="POST" style="display:inline;">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <button type="submit" class="logout-btn">Sair</button>
+      </form>
+    </div>
+    <h1>Dashboard</h1>
+
+    <h2>Minhas Tarefas</h2>
+    <div class="task-list">
+      <% if (tasks.length === 0) { %>
+        <div>Nenhuma tarefa cadastrada.</div>
+      <% } else { %>
+        <% tasks.forEach(function(task) { %>
+          <div class="task-item" style="border-left: 7px solid <%= task.category_color || '#ccc' %>; padding-left: 10px; margin-bottom: 10px;">
+            <strong><%= task.title %></strong><br>
+            <span><%= task.description %></span><br>
+            <span>Status: <%= task.status %>, Prioridade: <%= task.priority %></span><br>
+            <span>Categoria: <span style="color:<%= task.category_color || '#666' %>;"> <%= task.category_name || 'Sem categoria' %></span></span>
+            <form action="/tasks/<%= task.id %>?_method=DELETE" method="POST" style="display:inline;">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button type="submit">Apagar</button>
+            </form>
+          </div>
+        <% }) %>
+      <% } %>
+    </div>
+
+    <h3>Nova Tarefa</h3>
+    <form action="/tasks" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <div class="form-group">
+        <label>Título:</label>
+        <input type="text" name="title" required>
+      </div>
+      <div class="form-group">
+        <label>Descrição:</label>
+        <textarea name="description"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Prioridade:</label>
+        <select name="priority">
+          <option value="baixa">Baixa</option>
+          <option value="media" selected>Média</option>
+          <option value="alta">Alta</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Categoria:</label>
+        <select name="categoryId">
+          <option value="">Nenhuma</option>
+          <% categories.forEach(function(cat) { %>
+            <option value="<%= cat.id %>"><%= cat.name %></option>
+          <% }) %>
+        </select>
+      </div>
+      <button type="submit">Criar Tarefa</button>
+    </form>
+
+    <hr>
+
+    <h2>Minhas Categorias</h2>
+    <div class="category-list">
+      <% if (categories.length === 0) { %>
+        <div>Nenhuma categoria cadastrada.</div>
+      <% } else { %>
+        <% categories.forEach(function(cat) { %>
+          <div class="category-item" style="border-left: 7px solid <%= cat.color %>; padding-left: 10px; margin-bottom: 10px;">
+            <%= cat.name %> - <span style="color:<%= cat.color %>"><%= cat.color %></span>
+            <form action="/categories/<%= cat.id %>?_method=DELETE" method="POST" style="display:inline;">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button type="submit">Apagar</button>
+            </form>
+          </div>
+        <% }) %>
+      <% } %>
+    </div>
+
+    <h3>Nova Categoria</h3>
+    <form action="/categories" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <div class="form-group">
+        <label>Nome:</label>
+        <input type="text" name="name" required>
+      </div>
+      <div class="form-group">
+        <label>Cor:</label>
+        <input type="color" name="color" value="#3498db">
+      </div>
+      <button type="submit">Criar Categoria</button>
+    </form>
+
+  </div>
+</body>
+</html>
